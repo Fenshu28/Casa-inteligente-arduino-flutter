@@ -53,6 +53,7 @@ class _SeguridadState extends State<Seguridad> {
                   ShowDialog.showMessage(
                       'Completado', "Contraseña guardada.", context);
 
+                  Navigator.pop(context);
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
