@@ -16,6 +16,12 @@ class _MainPageState extends State<MainPage> {
   BluetoothController blueController = BluetoothController();
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: Drawer(
@@ -27,16 +33,10 @@ class _MainPageState extends State<MainPage> {
       body: Center(
           child: Column(
         children: [
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                blueController.receiveData();
-              });
-            },
-          ),
           const SizedBox(height: 20),
-          Text("Temperatura: ${DatosCasa.temperature}"),
-          Text("Humedad: ${DatosCasa.humedad}"),
+          
+          Text("Temperatura: ${DatosCasa.temperature} °C"),
+          Text("Humedad: ${DatosCasa.humedad} %"),
         ],
       )),
     );
@@ -59,7 +59,7 @@ class _MainPageState extends State<MainPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const Seguridad()));
+                            builder: (context) => const Seguridad(tipo: "actual")));
                   },
                 ),
                 ListTile(
@@ -69,7 +69,7 @@ class _MainPageState extends State<MainPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const Seguridad()));
+                            builder: (context) => const Seguridad(tipo: "actual",)));
                   },
                 )
               ]),

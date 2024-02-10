@@ -11,6 +11,8 @@ class BluetoothController {
   List<BluetoothDevice> _devices = [];
   BluetoothDevice? _deviceConnected;
 
+  
+
   get bluetooth => _bluetooth;
 
   bool get bluetoothState => _bluetoothState;
@@ -38,14 +40,13 @@ class BluetoothController {
       String data = String.fromCharCodes(event);
       if (data.isNotEmpty) {
         List<String> values = data.split(",");
-        
+
         switch (int.parse(values[0])) {
           case 0:
             DatosCasa.temperature = double.parse(values[1]);
             DatosCasa.humedad = double.parse(values[2]);
             break;
         }
-        // Accede a los valores:
 
         // DatosCasa.isAutentecado = bool.parse(values[2]);
         // DatosCasa.isAlarma = bool.parse(values[3]);
@@ -67,3 +68,4 @@ class BluetoothController {
     await Permission.bluetoothConnect.request();
   }
 }
+
