@@ -1,10 +1,13 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:myapp/controllers/ShowDialog.dart';
 
 class Seguridad extends StatefulWidget {
   final String? tipo;
-  const Seguridad({Key? key, required this.tipo}) : super(key: key);
+  final int paso;
+  const Seguridad({Key? key, required this.tipo, required this.paso})
+      : super(key: key);
 
   @override
   State<Seguridad> createState() => _SeguridadState();
@@ -49,18 +52,7 @@ class _SeguridadState extends State<Seguridad> {
             ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  // Aquí se llamaría a la función para bloquear la puerta
-                  ShowDialog.showMessage(
-                      'Completado', "Contraseña guardada.", context);
-
-                  Navigator.pop(context);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const Seguridad(
-                              tipo: "nuevo",
-                            )),
-                  );
+                  cambiarPanel();
                 }
               },
               child: const Text('Aceptar'),
@@ -78,5 +70,34 @@ class _SeguridadState extends State<Seguridad> {
       return 'El código debe tener 4 digitos.';
     }
     return null;
+  }
+
+  void cambiarPanel() {
+    switch (widget.paso) {
+      case 1:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const Seguridad(
+                    tipo: "nuevo",
+                    paso: 2,
+                  )),
+        );
+        break;
+      case 2:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const Seguridad(
+                    tipo: "confirmación",
+                    paso: 3,
+                  )),
+        );
+        break;
+    }
+    if (widget.paso == 3) {
+      Navigator.pop(context);
+      ShowDialog.showMessage('Completado', "Contraseña guardada.", context);
+    }
   }
 }

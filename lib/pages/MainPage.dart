@@ -3,6 +3,7 @@ import 'package:myapp/controllers/bluetooth_controller.dart';
 import 'package:myapp/model/datos.dart';
 import 'package:myapp/pages/AcercaDe.dart';
 import 'package:myapp/pages/ConfigPage.dart';
+import 'package:myapp/pages/Dashboard.dart';
 import 'package:myapp/pages/Seguridad.dart';
 
 class MainPage extends StatefulWidget {
@@ -21,33 +22,75 @@ class _MainPageState extends State<MainPage> {
     super.initState();
   }
 
+  void receiveData() {
+    blueController.connection?.input?.listen((event) {
+      String data = String.fromCharCodes(event);
+      if (data.isNotEmpty) {
+        List<String> values = data.split(",");
+
+        switch (int.parse(values[0])) {
+          case 0:
+            setState(() {
+              DatosCasa.temperatura = double.parse(values[1]);
+              DatosCasa.humedad = double.parse(values[2]);
+              print(double.parse(values[1]));
+            });
+
+            break;
+        }
+
+        // DatosCasa.isAutentecado = bool.parse(values[2]);
+        // DatosCasa.isAlarma = bool.parse(values[3]);
+        // DatosCasa.isPuerta = bool.parse(values[4]);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 198, 162, 245),
       drawer: Drawer(
         child: burggerMenu(context),
       ),
       appBar: AppBar(
-        title: const Text('Home control'),
+        backgroundColor: Color.fromARGB(255, 172, 121, 240),
+        title: const Text(
+          'Home control',
+          style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+        ),
       ),
       body: Center(
           child: Column(
-        children: [
-          const SizedBox(height: 20),
-          
-          Text("Temperatura: ${DatosCasa.temperature} °C"),
-          Text("Humedad: ${DatosCasa.humedad} %"),
-        ],
+        children: [const SizedBox(height: 20), GridDashboard()],
       )),
     );
   }
 
   Padding burggerMenu(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 10),
-      child: Column(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: ListView(
         children: [
-          const ListTile(leading: Icon(Icons.home), title: Text("Principal")),
+          const DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.blue,
+            ),
+            child: Text('Menú',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                )),
+          ),
+          ListTile(
+            leading: const Icon(Icons.home),
+            title: const Text("Principal"),
+            onTap: () {
+              receiveData();
+              // Navigator.push(context,
+              //     MaterialPageRoute(builder: (context) => GridDashboard()));
+            },
+          ),
           ExpansionTile(
               leading: const Icon(Icons.security),
               title: const Text("Seguridad"),
@@ -59,7 +102,10 @@ class _MainPageState extends State<MainPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const Seguridad(tipo: "actual")));
+                            builder: (context) => const Seguridad(
+                                  tipo: "actual",
+                                  paso: 1,
+                                )));
                   },
                 ),
                 ListTile(
@@ -69,7 +115,10 @@ class _MainPageState extends State<MainPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const Seguridad(tipo: "actual",)));
+                            builder: (context) => const Seguridad(
+                                  tipo: "actual",
+                                  paso: 1,
+                                )));
                   },
                 )
               ]),

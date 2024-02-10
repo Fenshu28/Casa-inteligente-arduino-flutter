@@ -124,7 +124,7 @@ class _ConfigPageState extends State<ConfigPage> {
                             blueController.devices = [];
                             blueController.isConnecting = false;
 
-                            blueController.receiveData();
+                            // blueController.receiveData();
 
                             setState(() {});
                           },
