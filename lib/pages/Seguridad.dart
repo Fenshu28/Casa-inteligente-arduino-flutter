@@ -2,11 +2,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:myapp/controllers/ShowDialog.dart';
+import 'package:myapp/controllers/bluetooth_controller.dart';
+import 'package:myapp/model/datos.dart';
 
 class Seguridad extends StatefulWidget {
   final String? tipo;
   final int paso;
-  const Seguridad({Key? key, required this.tipo, required this.paso})
+  final BluetoothController blueController;
+  const Seguridad(
+      {Key? key,
+      required this.tipo,
+      required this.paso,
+      required this.blueController})
       : super(key: key);
 
   @override
@@ -73,31 +80,32 @@ class _SeguridadState extends State<Seguridad> {
   }
 
   void cambiarPanel() {
-    switch (widget.paso) {
-      case 1:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const Seguridad(
-                    tipo: "nuevo",
-                    paso: 2,
-                  )),
-        );
-        break;
-      case 2:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const Seguridad(
-                    tipo: "confirmación",
-                    paso: 3,
-                  )),
-        );
-        break;
-    }
-    if (widget.paso == 3) {
-      Navigator.pop(context);
-      ShowDialog.showMessage('Completado', "Contraseña guardada.", context);
+    if (widget.blueController.connection?.isConnected ?? false) {
+      switch (widget.paso) {
+        case 1:
+          if (_codigoController.text == DatosCasa.codigo) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => Seguridad(
+                        tipo: "nuevo",
+                        paso: 2,
+                        blueController: widget.blueController,
+                      )),
+            );
+          } else {
+            ShowDialog.showMessage('Error', "Código incorrecto.", context);
+          }
+          break;
+      }
+      if (widget.paso == 2) {
+        DatosCasa.codigo = _codigoController.text;
+        widget.blueController.sendData("1,${_codigoController.text}");
+        Navigator.pop(context);
+        ShowDialog.showMessage('Completado', "Contraseña guardada.", context);
+      }
+    } else {
+      ShowDialog.showMessage('Error', "no está conectado.", context);
     }
   }
 }

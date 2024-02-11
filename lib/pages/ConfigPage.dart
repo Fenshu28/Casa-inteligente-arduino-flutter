@@ -12,27 +12,23 @@ class ConfigPage extends StatefulWidget {
 }
 
 class _ConfigPageState extends State<ConfigPage> {
-  late final BluetoothController blueController;
-
   @override
   void initState() {
     super.initState();
 
-    blueController = widget.blueController;
+    widget.blueController.requestPermission();
 
-    blueController.requestPermission();
-
-    blueController.bluetooth.state.then((state) {
-      setState(() => blueController.bluetoothState = state.isEnabled);
+    widget.blueController.bluetooth.state.then((state) {
+      setState(() => widget.blueController.bluetoothState = state.isEnabled);
     });
 
-    blueController.bluetooth.onStateChanged().listen((state) {
+    widget.blueController.bluetooth.onStateChanged().listen((state) {
       switch (state) {
         case BluetoothState.STATE_OFF:
-          setState(() => blueController.bluetoothState = false);
+          setState(() => widget.blueController.bluetoothState = false);
           break;
         case BluetoothState.STATE_ON:
-          setState(() => blueController.bluetoothState = true);
+          setState(() => widget.blueController.bluetoothState = true);
           break;
         // case BluetoothState.STATE_TURNING_OFF:
         //   break;
@@ -63,17 +59,17 @@ class _ConfigPageState extends State<ConfigPage> {
 
   Widget _controlBT() {
     return SwitchListTile(
-      value: blueController.bluetoothState,
+      value: widget.blueController.bluetoothState,
       onChanged: (bool value) async {
         if (value) {
-          await blueController.bluetooth.requestEnable();
+          await widget.blueController.bluetooth.requestEnable();
         } else {
-          await blueController.bluetooth.requestDisable();
+          await widget.blueController.bluetooth.requestDisable();
         }
       },
       tileColor: Colors.black26,
       title: Text(
-        blueController.bluetoothState
+        widget.blueController.bluetoothState
             ? "Bluetooth encendido"
             : "Bluetooth apagado",
       ),
@@ -84,24 +80,24 @@ class _ConfigPageState extends State<ConfigPage> {
     return ListTile(
       tileColor: Colors.black12,
       title: Text(
-          "Conectado a: ${blueController.deviceConnected?.name ?? "ninguno"}"),
-      trailing: blueController.connection?.isConnected ?? false
+          "Conectado a: ${widget.blueController.deviceConnected?.name ?? "ninguno"}"),
+      trailing: widget.blueController.connection?.isConnected ?? false
           ? TextButton(
               onPressed: () async {
-                await blueController.connection?.finish();
-                setState(() => blueController.deviceConnected = null);
+                await widget.blueController.connection?.finish();
+                setState(() => widget.blueController.deviceConnected = null);
               },
               child: const Text("Desconectar"),
             )
           : TextButton(
-              onPressed: blueController.getDevices,
+              onPressed: widget.blueController.getDevices,
               child: const Text("Ver dispositivos"),
             ),
     );
   }
 
   Widget _listDevices() {
-    return blueController.isConnecting
+    return widget.blueController.isConnecting
         ? const Center(child: CircularProgressIndicator())
         : SingleChildScrollView(
             child: Container(
@@ -109,20 +105,21 @@ class _ConfigPageState extends State<ConfigPage> {
               child: Column(
                 children: [
                   ...[
-                    for (final device in blueController.devices)
+                    for (final device in widget.blueController.devices)
                       ListTile(
                         title: Text(device.name ?? device.address),
                         trailing: TextButton(
                           child: const Text('conectar'),
                           onPressed: () async {
-                            setState(() => blueController.isConnecting = true);
+                            setState(() =>
+                                widget.blueController.isConnecting = true);
 
-                            blueController.connection =
+                            widget.blueController.connection =
                                 await BluetoothConnection.toAddress(
                                     device.address);
-                            blueController.deviceConnected = device;
-                            blueController.devices = [];
-                            blueController.isConnecting = false;
+                            widget.blueController.deviceConnected = device;
+                            widget.blueController.devices = [];
+                            widget.blueController.isConnecting = false;
 
                             // blueController.receiveData();
 

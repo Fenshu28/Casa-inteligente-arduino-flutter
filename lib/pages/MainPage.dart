@@ -33,9 +33,14 @@ class _MainPageState extends State<MainPage> {
             setState(() {
               DatosCasa.temperatura = double.parse(values[1]);
               DatosCasa.humedad = double.parse(values[2]);
-              print(double.parse(values[1]));
+              print(values[1]);
             });
 
+            break;
+          case 1:
+            setState(() {
+              DatosCasa.isAutentecado = bool.parse(values[1]);
+            });
             break;
         }
 
@@ -87,8 +92,6 @@ class _MainPageState extends State<MainPage> {
             title: const Text("Principal"),
             onTap: () {
               receiveData();
-              // Navigator.push(context,
-              //     MaterialPageRoute(builder: (context) => GridDashboard()));
             },
           ),
           ExpansionTile(
@@ -102,9 +105,10 @@ class _MainPageState extends State<MainPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const Seguridad(
+                            builder: (context) => Seguridad(
                                   tipo: "actual",
                                   paso: 1,
+                                  blueController: blueController,
                                 )));
                   },
                 ),
@@ -115,9 +119,10 @@ class _MainPageState extends State<MainPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const Seguridad(
+                            builder: (context) => Seguridad(
                                   tipo: "actual",
                                   paso: 1,
+                                  blueController: blueController,
                                 )));
                   },
                 )
