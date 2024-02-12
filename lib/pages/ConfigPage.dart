@@ -90,7 +90,10 @@ class _ConfigPageState extends State<ConfigPage> {
               child: const Text("Desconectar"),
             )
           : TextButton(
-              onPressed: widget.blueController.getDevices,
+              onPressed: widget.blueController.getDevices
+
+              // setState(() {});
+              ,
               child: const Text("Ver dispositivos"),
             ),
     );
@@ -118,11 +121,13 @@ class _ConfigPageState extends State<ConfigPage> {
                                 await BluetoothConnection.toAddress(
                                     device.address);
                             widget.blueController.deviceConnected = device;
+
                             widget.blueController.devices = [];
                             widget.blueController.isConnecting = false;
 
-                            // blueController.receiveData();
-
+                            // setState(() {
+                            //   widget.blueController.receiveData();
+                            // });
                             setState(() {});
                           },
                         ),

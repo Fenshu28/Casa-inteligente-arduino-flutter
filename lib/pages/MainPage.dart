@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/controllers/NotfiService.dart';
 import 'package:myapp/controllers/bluetooth_controller.dart';
 import 'package:myapp/model/datos.dart';
 import 'package:myapp/pages/AcercaDe.dart';
+import 'package:myapp/pages/AlarmaPage.dart';
 import 'package:myapp/pages/ConfigPage.dart';
 import 'package:myapp/pages/Dashboard.dart';
 import 'package:myapp/pages/Seguridad.dart';
@@ -13,7 +15,7 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   BluetoothController blueController = BluetoothController();
 
   @override
@@ -27,26 +29,39 @@ class _MainPageState extends State<MainPage> {
       String data = String.fromCharCodes(event);
       if (data.isNotEmpty) {
         List<String> values = data.split(",");
-
+        // print(values[0]);
         switch (int.parse(values[0])) {
           case 0:
             setState(() {
               DatosCasa.temperatura = double.parse(values[1]);
               DatosCasa.humedad = double.parse(values[2]);
-              print(values[1]);
+              // print(values[1]);
             });
 
             break;
           case 1:
+            // setState(() {
+            print(values[1]);
+
+            // if (DatosCasa.isVTemp != bool.parse(values[1])) {
+            //   DatosCasa.isViolado = bool.parse(values[1]);
+            //   DatosCasa.isVTemp = bool.parse(values[1]);
+            if (values[1].toString().contains("true")) {
+              NotificationService().showNotification(
+                  title: 'Alertaaaa',
+                  body: 'Te estan robando!! llamando a los bomberos');
+            }
+            // print(values[1]);
+            // }
+            // });
+            break;
+          case 2:
             setState(() {
-              DatosCasa.isAutentecado = bool.parse(values[1]);
+              DatosCasa.isBloqueado = bool.parse(values[1]);
+              // print(values[1]);
             });
             break;
         }
-
-        // DatosCasa.isAutentecado = bool.parse(values[2]);
-        // DatosCasa.isAlarma = bool.parse(values[3]);
-        // DatosCasa.isPuerta = bool.parse(values[4]);
       }
     });
   }
@@ -67,9 +82,43 @@ class _MainPageState extends State<MainPage> {
       ),
       body: Center(
           child: Column(
-        children: [const SizedBox(height: 20), GridDashboard()],
+        children: [
+          const SizedBox(height: 20),
+          GridDashboard(),
+          const SizedBox(
+            height: 500,
+          )
+        ],
       )),
     );
+  }
+
+  Switch switchAlarma() {
+    return Switch(
+        value: DatosCasa.isBloqueado,
+        onChanged: (value) {
+          setState(() {
+            DatosCasa.isBloqueado = value;
+            blueController.sendData("2,${DatosCasa.isBloqueado}");
+          });
+        });
+    // FlutterSwitch(
+    //   width: 125.0,
+    //   height: 55.0,
+    //   valueFontSize: 25.0,
+    //   toggleSize: 45.0,
+    //   value: DatosCasa.isBloqueado,
+    //   borderRadius: 30.0,
+    //   padding: 8.0,
+    //   activeColor: Color.fromARGB(255, 0, 204, 68),
+    //   showOnOff: true,
+    //   onToggle: (val) {
+    //     setState(() {
+    //       DatosCasa.isBloqueado = val;
+    //       blueController.sendData("2,${DatosCasa.isBloqueado}");
+    //     });
+    //   },
+    // );
   }
 
   Padding burggerMenu(BuildContext context) {
@@ -100,7 +149,7 @@ class _MainPageState extends State<MainPage> {
               children: [
                 ListTile(
                   leading: const SizedBox(),
-                  title: const Text("Acceso al hogar"),
+                  title: const Text("Cambiar código"),
                   onTap: () {
                     Navigator.push(
                         context,
@@ -114,31 +163,15 @@ class _MainPageState extends State<MainPage> {
                 ),
                 ListTile(
                   leading: const SizedBox(),
-                  title: const Text("Alertas de seguridad"),
+                  title: const Text("Alarma"),
                   onTap: () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => Seguridad(
-                                  tipo: "actual",
-                                  paso: 1,
-                                  blueController: blueController,
-                                )));
+                            builder: (context) =>
+                                AlarmaPage(blueController: blueController)));
                   },
-                )
-              ]),
-          const ExpansionTile(
-              leading: Icon(Icons.broadcast_on_home_rounded),
-              title: Text("Entorno del hogar"),
-              children: [
-                ListTile(
-                  leading: SizedBox(),
-                  title: Text("Temperatura"),
                 ),
-                ListTile(
-                  leading: SizedBox(),
-                  title: Text("Humedad"),
-                )
               ]),
           ListTile(
             leading: const Icon(Icons.settings_bluetooth),
